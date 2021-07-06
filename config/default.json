@@ -1,0 +1,5 @@
+
+{"port" : 5000,
+"mongoUri": "mongodb+srv://qwer:qwer1234qwer@cluster0.hietg.mongodb.net/pet?retryWrites=true&w=majority",
+"jwtSecret": "gitlergohome"
+}
