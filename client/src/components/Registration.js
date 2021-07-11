@@ -38,7 +38,7 @@ export const Registration = (props) => {
       <button 
       onClick = {() => registration(email, password)}
       className = "btn waves-effect waves-light" type="submit" name="action">
-        Зарегестрироваться
+        Зарегестрироваться///
         </button>
     </div>
     )
