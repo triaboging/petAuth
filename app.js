@@ -1,7 +1,7 @@
 console.log('APP!')
-
+require('dotenv').config();
 const express = require ('express')
-
+require('dotenv').config();
 const authRouter = require('./routes/auth.routes')
 const mongoose = require('mongoose')
 const config = require('config')

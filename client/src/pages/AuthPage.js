@@ -1,4 +1,6 @@
 import React from 'react'
+import { Formik } from 'formic'
+import * as yup from 'yup';
 import { Registration } from '../components/Registration'
 
 export const AuthPage = () => {

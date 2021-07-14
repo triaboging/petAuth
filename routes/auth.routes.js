@@ -6,6 +6,8 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const authMiddleWare = require('../middleware/authMiddleWare')
 const { check, validationResult } = require('express-validator')
+const uuid = require('uuid')
+const mailService = require('../service/mail-service')
 
 // /api/auth/register
 router.post('/register',
@@ -14,6 +16,7 @@ router.post('/register',
     ],
     async (req, res) => {
         try {
+           
             const errors = validationResult(req)
             if (!errors.isEmpty()) {
                 return res.status(400).json({
@@ -30,7 +33,10 @@ router.post('/register',
                 res.status(400).json({ message: 'Taкой пользователь уже усть...' })
             }
             const hashedPassword = await bcrypt.hash(password, 12)
-            const user = new User({ email, password: hashedPassword })
+            const activationLink = uuid.v4()
+            console.log('activationLink', activationLink)
+            const user = new User({ email, password: hashedPassword , activationLink})
+            await mailService.sendActivationMail(email, `${process.env.API_URL}/api/auth/activate/${activationLink}` )
             await user.save()
             res.status(201).json({ message: 'Пользователь создан' })
         } catch (e) {
@@ -119,6 +125,46 @@ router.get('/auth', authMiddleWare,
             },
             message: 'Пользователь прошел аутентифиакацию и обновил token'
         })
+    }
+    catch (e) {
+        console.log(e)
+        res.send({ message: "Server error" })
+    }
+})
+
+router.get('/activate/:link',
+    async(req, res)=> {
+        try{
+            const activationLink = req.params.link
+            const user = await User.findOne({activationLink})
+            if(!user){
+                throw new Error('Некорректная ссылка для активации')
+            }
+            user.isActivated = true
+            await user.save()
+            return res.redirect('http://localhost:3000/confirmation'),
+            res.json({ message: "аккаунт подтвержден" })
+
+        }catch(e){
+            console.log(e)
+        }
+    }
+);
+router.delete('/delete', 
+ async (req, res) => {
+    try {
+        console.log('vvvvvvvvv')
+        const {email} = req.body
+        const user = await User.findOneAndRemove({email })
+        // await user.save()
+        const confirmation = await User.findOne({email })
+        if(!confirmation){
+            return res.json({
+            
+                message: `Пользователь ${email} удален с бд`
+            })
+        }
+        
     }
     catch (e) {
         console.log(e)
