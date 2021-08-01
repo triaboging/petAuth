@@ -2,13 +2,15 @@ import React from 'react'
 import { Input } from './input'
 import { useState } from 'react'
 import {registration} from '../actions/user'
-import {login} from '../actions/user'
+import {login, getPostsFunction} from '../actions/user'
 import { useDispatch } from 'react-redux'
+import { useHistory } from 'react-router-dom';
 
 
 export const Login = (props) => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    let history = useHistory()
      const dispatch = useDispatch()
     return (
     <div className="row">
@@ -38,7 +40,9 @@ export const Login = (props) => {
         
          </div>
       <button 
-      onClick = {() =>dispatch (login(email, password))}
+      onClick = {() =>dispatch (login(email, password, history))}
+     
+    
       className = "btn waves-effect waves-light" type="submit" name="action">
         Войти
         </button>

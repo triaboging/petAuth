@@ -4,7 +4,8 @@ import { LinksPage } from './pages/LinksPage'
 import { AuthPage } from './pages/AuthPage'
 import { Login } from './components/Login'
 import { useSelector } from 'react-redux'
-export const useRoutes =()=>{
+import { CreatePost } from './components/CreatePost/CreatePost';
+export const useRoutes = () => {
     const isAuth = useSelector(state => state.userReducer.isAuth)
 if(isAuth) {
     return(
@@ -12,6 +13,10 @@ if(isAuth) {
             <Route path="/links" exact>
                 <LinksPage />
             </Route>
+            <Route path='/create' exact>
+                <CreatePost/>
+            </Route>
+            <Redirect to="/create" />
         </Switch>
     )
 } return (

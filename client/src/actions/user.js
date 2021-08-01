@@ -1,6 +1,8 @@
 import axios from 'axios'
-import React from 'react'
-import { setUser, logout } from '../reducers/userReducer'
+import React  from 'react'
+import { useHistory } from 'react-router-dom';
+import { setUser, logout, setLoader, createPost } from '../reducers/userReducer'
+import { disableLoader, getPosts } from './../reducers/userReducer';
 export const registration = async (email, password) => {
     try{
         const response = await axios.post(`http://localhost:5000/api/auth/register`,
@@ -13,8 +15,10 @@ export const registration = async (email, password) => {
         console.log(e)
     }
 }
-export const login =  (email, password) => {
+export const login =  (email, password, history) => {
+    
     return async dispatch => {
+        dispatch(setLoader()) 
         try{
             const response = await axios.post(`http://localhost:5000/api/auth/login`,
         {email, password})
@@ -22,10 +26,13 @@ export const login =  (email, password) => {
         localStorage.setItem('token', response.data.token)
         alert(response.data.message)
         alert(response.data.token)
+        history.push('/links')
         }
+        
         
         catch(e){
             // alert(e.response.data.message)
+            dispatch(disableLoader());
             console.log(e)
         }
     }
@@ -45,6 +52,66 @@ export const auth =  () => {
         } catch (e) {
             // alert(e.response.data.message)
             localStorage.removeItem('token')
+        }
+    }
+}
+export const createPostFunction = (form, history) => {
+    
+    return async dispatch => {
+        // let history = useHistory()
+        dispatch(setLoader()) 
+        try {
+            console.log('мы тута224')
+            const response = await axios.post(`http://localhost:5000/api/auth/create`,
+            {...form},
+            {headers:{Authorization:`Bearer ${localStorage.getItem('token')}`}},
+                
+            )
+            const newPost = response.data.post
+            // dispatch(createPost(newPost))
+            console.log('мы тута2')
+            
+            history.push('/links')
+            console.log('мы тута3')
+            
+            // localStorage.setItem('token', response.data.token)
+            console.log('мы тута4')
+            
+        } catch (e) {
+            
+            dispatch(disableLoader());
+            console.log(e)
+            
+        }
+    }
+}
+export const getPostsFunction = () => {
+    
+    return async dispatch => {
+       
+        dispatch(setLoader()) 
+        try {
+            console.log('мы тута3333')
+            const response = await axios.get(`http://localhost:5000/api/auth/getpost`,
+            
+            {headers:{Authorization:`Bearer ${localStorage.getItem('token')}`}},
+                
+            )
+            const posts = response.data.posts
+            dispatch(getPosts(posts))
+            console.log('мы тута2')
+            
+            
+            console.log('мы тута5000')
+            
+            // localStorage.setItem('token', response.data.token)
+            console.log('мы тута4')
+            
+        } catch (e) {
+            
+            dispatch(disableLoader());
+            console.log(e)
+            
         }
     }
 }

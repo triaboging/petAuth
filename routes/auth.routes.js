@@ -2,6 +2,7 @@ const Router = require('express')
 const router = new Router()
 const config = require('config')
 const User = require('../models/User')
+const Posts = require('../models/Posts')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const authMiddleWare = require('../middleware/authMiddleWare')
@@ -110,6 +111,7 @@ router.get('/auth', authMiddleWare,
             config.get('jwtSecret'),
             { expiresIn: '1h' }
         )
+        
         return res.json({
             token,
             
@@ -125,6 +127,54 @@ router.get('/auth', authMiddleWare,
         res.send({ message: "Server error" })
     }
 })
-
+// ////////////////////////
+router.post('/create', authMiddleWare,
+ async (req, res) => {
+    try {
+        console.log('место №200')
+         const user = await User.findOne({_id: req.user.id })
+        // const token = jwt.sign({ id: user.id },//хешируем userID
+        //     config.get('jwtSecret'),
+        //     { expiresIn: '1h' }
+        // )
+        const { title, discription } = req.body
+        console.log('запрос', req.body)
+        console.log('значения', title, discription)
+        const post = new Posts({title, discription, owner: req.user.id});
+        await post.save()
+        
+        return res.status(201).json({
+            
+            post,
+            user: {
+                id: user.id,
+                email: user.email,
+                title,
+                discription
+            },
+            message: 'новый пост создан'
+        })
+    }
+    catch (e) {
+        console.log(e)
+        res.send({ message: "Server error" })
+    }
+})
+router.get('/getpost',  authMiddleWare,
+    async(req, res) => {
+        try{
+            const posts = await Posts.find({ owner: req.user.id })
+            return res.status(201).json({
+                posts,
+                
+                message: 'посты получены'
+            })
+        }
+        catch(e){
+            res.status(500).json({ message: "хмм, вот ведь незадача, что-то пошло не так" })
+            console.log(e)
+        }
+    }
+)
 
 module.exports = router
