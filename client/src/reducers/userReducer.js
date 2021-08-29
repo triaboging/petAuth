@@ -48,6 +48,7 @@ export default function userReducer (state = initialState, action) {
                 //  posts: [...state.posts, ...action.payload]
                 posts: action.payload
             }
+       
         default:
              return state
     }

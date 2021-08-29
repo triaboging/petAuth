@@ -1,6 +1,6 @@
 import axios from 'axios'
-import React  from 'react'
-import { useHistory } from 'react-router-dom';
+import React, { useCallback }  from 'react'
+
 import { setUser, logout, setLoader, createPost } from '../reducers/userReducer'
 import { disableLoader, getPosts } from './../reducers/userReducer';
 export const registration = async (email, password) => {
@@ -24,8 +24,8 @@ export const login =  (email, password, history) => {
         {email, password})
         dispatch(setUser(response.data.user))
         localStorage.setItem('token', response.data.token)
-        alert(response.data.message)
-        alert(response.data.token)
+        alert( response.data.message)
+        alert( response.data.token)
         history.push('/links')
         }
         
@@ -50,7 +50,7 @@ export const auth =  () => {
             localStorage.setItem('token', response.data.token)
             console.log('мы тута')
         } catch (e) {
-            // alert(e.response.data.message)
+           
             localStorage.removeItem('token')
         }
     }
@@ -115,3 +115,22 @@ export const getPostsFunction = () => {
         }
     }
 }
+
+export const getDetailLink = (linkId, setLink)=>{
+    return async dispatch => {
+       
+        dispatch(setLoader()) 
+    try{
+        const response = await axios.get(`http://localhost:5000/api/auth/detail/${linkId}`,
+            
+            {headers:{Authorization:`Bearer ${localStorage.getItem('token')}`}},
+                
+            )
+        setLink(response.data)
+
+        dispatch(disableLoader());
+    }catch(e){
+        dispatch(disableLoader());
+            console.log(e)
+    }
+}}

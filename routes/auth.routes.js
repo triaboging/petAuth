@@ -176,5 +176,30 @@ router.get('/getpost',  authMiddleWare,
         }
     }
 )
+///////////////////
+router.get('/detail/:id',  authMiddleWare,
+    async(req, res) => {
+        try{
+            id = req.params.id
+            console.log('место 445', id)
+            const post = await Posts.findById({ _id: id })
+            const owner = post.owner
+            const user = await User.findOne({_id: owner})
+            const email = user.email
+            console.log('owner: ', owner )
+            console.log('user: ', user )
+            
+            return res.status(201).json({
+                post,
+                email,
+                message: 'пост получен'
+            })
+        }
+        catch(e){
+            res.status(500).json({ message: "хмм, вот ведь незадача, что-то пошло не так" })
+            console.log(e)
+        }
+    }
+)
 
 module.exports = router
